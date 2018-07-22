@@ -253,14 +253,23 @@ where $\hat{\Sigma}(\rho_{flibe})$ is the estimation of a flibe macroscopic cros
 $c_0$ and $c_1$ are the constants to be calculated.
 
 Unlike the liquid salt coolant, the solid fuel do not change shape or density in the range of the considered temperatures. The fuel temperature reactivity feedback (also called the Doppler feedback) is mainly due to the Doppler broadening of the microscopic cross-sections of the fuel material.
-Therefore, the fuel cross-sections are described by a linear-log function of the fuel temperature. During fast transients such as reactivity induced accidents, the heat does not have time to reach the coolant. The core relies on the temperature reactivity feedback from the fuel inside the TRISO particles to stabilize. It is important to compute the temperature distribution inside TRISO particles and fuel pebbles, and use the temperatures at different depth to compute cross-sections. The cross-sections in the fuel region is expressed in the following form:
+Therefore, the fuel cross-sections are described by a linear-log function of the fuel temperature. During fast transients such as reactivity induced accidents, the heat does not have time to reach the coolant. The core relies on the temperature reactivity feedback from the fuel inside the TRISO particles to stabilize. It is important to compute the temperature distribution inside TRISO particles and fuel pebbles, and use the temperatures at different depth to compute cross-sections. 
 
-\begin{align}
-  \hat{\Sigma} (T_{fuel}) = c_0 + c_1(log(T_{fuel}) - log(T_0))
-  \label{eq:XS_linear_log}
-\end{align}
+A multiscale cross-section is express as a linear combination of the logarithm of fuel temperatures. 
 
-where $\hat{\Sigma}(T_{fuel})$ is the estimation of a fuel macroscopic cross-section, $T_{fuel}$ is the fuel temperature, or temperature vector in case many temperatures affect the homogenized cross-section in a fuel region, and $c_0$, $c_1$ are the coefficients we search for.
+\begin{equation}
+\hat{\Sigma} (T_{fuel}) = c_0 + [c_1, c_2, ... c_n] \begin{bmatrix}
+    log(T_{11}) \\
+    log(T_{12}) \\
+    log(T_{13}) \\
+    ...\\
+    log(T_{nm})\\
+\end{bmatrix}
+\label{eq:linear_log}
+\end{equation}
+
+
+where $\hat{\Sigma}(T_{fuel})$ is the estimation of a fuel macroscopic cross-section, $T_{fuel}$ is the temperature or temperature vector in case many temperatures affect the same cross-section, $T_{nm}$ is the temperature of the mth layer in a TRISO particle in the nth layer of a fuel pebble and $c_0$, $c_1$ are the coefficients we search for.
 
 \subsection{Thermal-hydraulics}
 Direct CFD modeling of the flow passage formed by more than 10000 pebbles is not practical with current computation capacity. Porous media model requires considerably less computational resource and is used in the multi-physics model.
@@ -603,21 +612,7 @@ The model uses thermal property values in Table \ref{tab:flibe} for flibe coolan
 To model the flow field and heat transfer in the pebble bed, porous media approach computes a liquid temperature and a fuel temperature at each point in the region and connect the two phases through convective heat transfer. The fuel temperature is of prime important in FHR transient response because of the large Doppler temperature reactivity feedback. Therefore, multiscale temperature treatment is implemented for a more realistic representation of the feedback from fuel temperature changes. 
 Temperature inside fuel pebbles are computed in three subdivided fuel layers, and likewise the fuel kernel in the TRISO particles are divided into three sub-layers, for which temperatures are tracked during a transient and are used to compute fuel region macroscopic cross-sections. The effects of this treatment on the response to reactivity insertion and overcooling transients are discussed further in section \ref{sec:TMSR_transients} when we analyze the TMSR transient behaviors.
 
-A multiscale cross-section is express as a linear combination of the logarithm of fuel temperatures. 
 
-\begin{equation}
-\hat{\Sigma} (T_{fuel}) = c_0 + [c_1, c_2, ... c_n] \begin{bmatrix}
-    log(T_{11}) \\
-    log(T_{12}) \\
-    log(T_{13}) \\
-    ...\\
-    log(T_{nm})\\
-\end{bmatrix}
-\label{eq:linear_log}
-\end{equation}
-
-
-where $\hat{\Sigma}(T_{fuel})$ is the estimation of a fuel macroscopic cross-section, $T_{fuel}$ is the temperature or temperature vector in case many temperatures affect the same cross-section, $T_{nm}$ is the temperature of the mth layer in a TRISO particle in the nth layer of a fuel pebble and $c_0$, $c_1$ are the coefficients we search for.
 
 A vacuum boundary condition is applied at the outer surfaces of the reflector. And a symmetry boundary condition is used at the core center-line in 2-D axi-symmetrical models.
 
