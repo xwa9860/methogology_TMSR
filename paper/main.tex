@@ -727,7 +727,7 @@ And the time scale and amplitude of these changes are compared respectively in s
   \label{fig:zero_power}
 \end{figure}
 
-The time constant of the system is compared via zero power reactivity insertion transient simulations. External reactivity is inserted into the core at norminal zero power conditions and without temperature reactivity feedback that would stablize the power at a certain level, the reactor power increases exponentially due to excess external reactivity, as shown in equation \ref{eq:pexp}. 
+The time constant of the system is compared via zero power reactivity insertion transient simulations. External reactivity is inserted into the core at norminal zero power conditions and without temperature reactivity feedback that would stablize the power at a certain level, the reactor power increases exponentially due to excess external reactivity, as shown in Equation \ref{eq:pexp}. 
 The speed in which the power ramps up is a direct characteristic of the reactor time scale in the model, as shown in equation \ref{eq:pexp}. 
 
 \begin{equation}
@@ -749,18 +749,12 @@ As we can see, the results from the COMSOL model match closely to those from the
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.6\columnwidth]{./images/benchmark/fuel_feedback.png}
-  \includegraphics[width=0.6\columnwidth]{./images/benchmark/flibe_feedback.png}
+  \includegraphics[width=0.6\columnwidth]{./images/benchmark/feedback_fuel.png}
+  \includegraphics[width=0.6\columnwidth]{./images/benchmark/feedback_flibe.png}
   \caption{Comparison between the diffusion based model and the Monte Carlo based model for fuel and flibe temperature (and void) feedback effect. Error bar shows statistical error in Monte Carlo results.} 
   \label{fig:fuel_feedback}
 \end{figure}
 
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[width=0.6\columnwidth]{./images/benchmark/flibe_feedback.png}
-%   \caption{Comparison between the diffusion based model and the Monte Carlo based model for flibe temperature feedback effect. Error bar shows statistical error in Monte Carlo results.} 
-%   \label{fig:flibe_feedback}
-% \end{figure}
 
 
 The ability of accurately capturing the temperature reactivity feedback coefficients is crucial for a coupled neutronics and thermal-hydraulics model because these parameters are the macroscopic manifestation of the coupling between thermal hydraulics and neutronics. They embody the effects of temperature change on core neutronics. 
@@ -776,14 +770,50 @@ The relative error in flibe reactivity feedback is larger but the absolute error
 
 
 \subsection{Steady state results}
-After careful code-to-code verification for the multi-physics model, parameters such as power, flibe and fuel temperatures, and neutron flux are computed with design parameters in Table \ref{tab:tmsr_design}. Uniform temperature and uniform upward velocity are imposed as the inlet boundary condition. Vacuum boundary condition for neutron diffusion is used outside of the reflector.  
+After careful code-to-code verification for the multi-physics model, parameters such as power, flibe and fuel temperatures, and neutron flux are computed. Uniform temperature and uniform upward velocity are imposed as the inlet boundary condition. Vacuum boundary condition for neutron diffusion is used outside of the reflector.  
 
 % flux
+\begin{figure}
+  \centering
+  \begin{subfigure}[b]{0.46\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{./images/diffusion/tmsr/SS/non_ms/fast_flux.png}
+        \caption{Fast neutron flux ([5.00E-07, 1.40] MeV)}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.46\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{./images/diffusion/tmsr/SS/non_ms/thermal_flux.png}
+        \caption{Thermal neutron flux ([0.00, 5.00E-07] MeV)}
+    \end{subfigure}
+    \caption{Steady state neutron flux}
+    \label{fig:ss_res_flux}
+\end{figure}
+
 An eight-group energy structure is used in the neutron diffusion equations but the neutron flux values are regrouped into thermal ([0.00E+00, 5.00E-07] MeV) and fast ([5.00E-07, 1.40E+00] MeV) regions for plotting purpose. As confirmed by the plots, fast neutrons are generated exclusively from nuclear reactions in the fuel region and are then scattered by the matters in the core as they get thermalized. 
 The moderation effect of the coolant is dwarfed by that of the graphite reflector in TMSR. As a result, a large portion of thermal neutrons is found inside the reflector, besides the center of the core.
 
 The thermal neutrons that travel back from the reflector to the fuel region cause a peak in power density near the border as they trigger nuclear reactions. 
+
 % power
+\begin{figure}
+    
+        \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{./images/diffusion/tmsr/SS/non_ms/Pdensity(steady_state).png}
+        \end{subfigure}
+        ~
+        \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{./images/diffusion/tmsr/SS/non_ms/power_peaking_r.png}
+        \includegraphics[width=0.8\textwidth]{./images/diffusion/tmsr/SS/non_ms/power_peaking_z.png}
+        \caption*{Radial and axial power profile}
+    \end{subfigure}%
+    
+    \caption{Power distribution in TMSR SF-1}
+    \label{fig:tmsr_power_ss}
+\end{figure}
+
 As shown in figure \ref{fig:tmsr_power_ss}, the power peaks at the center of the fuel region, decreases outward and increases again next to the reflector boundaries due to the moderation effect of the graphite reflector. This confirms that the neutron diffusion based model captures the boundary effect adequately. The radial power peaking in TMSR SF-1 is 1.24 at nominal conditions with fresh fuel.
 
  
@@ -1020,6 +1050,13 @@ The temperatures gradient inside a fuel pebble is higher after the transient bec
 Strict safety requirement for next-generation reactors along with the progress in computer technology prompts the development, qualification and application of time-dependent multi-physics models for FHRs.
 In this paper, a methodology for building coupled neutronics/thermal-hydraulics model for FHRs is described. It utilizes COMSOL Multiphysics to solve for neutron diffusion, delayed neutron precursor concentration equations and porous media CFD. Benchmarking with the Monte Carlo based model shows satisfying agreement. The model provides high resolution two dimensional or three dimensional results within a reasonable amount of time on a computer with 16.0 GB RAM and four Intel Core equipped with i7-4790K CPU at 4.00 GHz.
 
+The Fick's law assumption in diffusion models does not take directional variations in neutron transport into account, and this assumption is violated in strong absorbers such as control rods.
+This section describes a control rods modeling method based on the $SP_3$ approximation of NTE that is more accurate than the diffusion approximation, especially in control rod regions, and yet is considerably less expensive than the discrete ordinates ($S_N$) or spherical harmonics ($P_N$) approaches. In addition, the $SP_3$ equations can be solved in the same manner as the diffusion equations, which allows similar implementations with the same tools.
+
+In conventional porous media formulation, only an average temperature inside the solid phase is computed. This is a reasonable assumption in steady state cases and in most slow transient problems where the fuel kernel temperature is very close to the temperature of the surrounding graphite matrix. However, in the case of fast transients involving large power excursions, the difference between fuel and graphite temperatures can be significant. Thus a detailed temperature profile inside the fuel pebbles and TRISO fuel kernels is necessary for accurately computing temperature, which is important in capturing the Doppler temperature reactivity feedback.
+Overall, the power excursion in response to either a large reactivity insertion or a overcooling transient is dampened when a temperature profile in the fuel element is used, because the temperature reactivity feedback is captured more realistically at the place where the largest feedback occurs. 
+
+
 Although the results discussed in this paper are based on a specific FHR design - the TMSR, the methodology can be used for all pebble bed FHRs.
 
 Steady state and transient results of power, temperatures and neutron flux are discussed in this paper. The use of thermal resistant TRISO fuel, flibe coolant and graphite reflectors renders the core extremely robust against accidents. 
@@ -1027,8 +1064,6 @@ Because of the use of highly robust elements in the core, failures due to high t
 The fuel and coolant temperature during a 1\$ reactivity insertion is within the safety limit.
 Likely, during the overcooling transient, where the coolant inlet temperature is dropped by 100 $^{\circ}C$ in 10 seconds, the core-wise maximum fuel temperature is 950 $^{\circ}C$, largely below the safety limit for fuel element. The coolant temperature stabilizes at a lower level than the initial condition, but is still above the salt freezing point.
 
-In conventional porous media formulation, only an average temperature inside the solid phase is computed. This is a reasonable assumption in steady state cases and in most slow transient problems where the fuel kernel temperature is very close to the temperature of the surrounding graphite matrix. However, in the case of fast transients involving large power excursions, the difference between fuel and graphite temperatures can be significant. Thus a detailed temperature profile inside the fuel pebbles and TRISO fuel kernels is necessary for accurately computing temperature, which is important in capturing the Doppler temperature reactivity feedback.
-Overall, the power excursion in response to either a large reactivity insertion or a overcooling transient is dampened when a temperature profile in the fuel element is used, because the temperature reactivity feedback is captured more realistically at the place where the largest feedback occurs. 
 
 \section*{References}
 
