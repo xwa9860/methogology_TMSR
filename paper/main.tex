@@ -577,7 +577,7 @@ The TMSR SF-1 core is surrounded by an outer graphite reflector, which provides 
 
 \subsection{Multiphysics modeling for TMSR SF-1}
 
-As shown in Figure \ref{fig:model_geom}, the multi-physics reactor core model is composed by three regions: an upper porous region that represents a fuel pebble and flibe salt porous mixture, a lower region with only flibe salt and an outer graphite reflector region. Coupled heat transfer and neutron diffusion equations are solved with homogenized material properties for each region. 
+As shown in Figure \ref{fig:model_geom}, the multiphysics reactor core model is composed by three regions: an upper porous region that represents a fuel pebble and flibe salt porous mixture, a lower region with only flibe salt and an outer graphite reflector region. Coupled heat transfer and neutron diffusion equations are solved with homogenized material properties for each region. 
 
 
 \begin{figure}[h]
@@ -591,7 +591,7 @@ As shown in Figure \ref{fig:model_geom}, the multi-physics reactor core model is
     \includegraphics[width = \columnwidth]{./images/diffusion/tmsr/finer.png}
     %\caption{Schematic of the 2D mesh}
   \end{subfigure}
-  \caption{Schematic of the multi-physics model for TMSR SF-1 and a three-dimensional mesh}
+  \caption{Schematic of the multiphysics model for TMSR SF-1 and a three-dimensional mesh}
   \label{fig:model_geom}
 \end{figure}
 
@@ -789,7 +789,7 @@ The relative error in flibe reactivity feedback is larger but the absolute error
 
 
 \subsection{Steady state results}
-After careful code-to-code verification for the multi-physics model, parameters such as power, flibe and fuel temperatures, and neutron flux are computed. Uniform temperature and uniform upward velocity are imposed as the inlet boundary condition. Vacuum boundary condition for neutron diffusion is used outside of the reflector.  
+After careful code-to-code verification for the multiphysics model, parameters such as power, flibe and fuel temperatures, and neutron flux are computed. Uniform temperature and uniform upward velocity are imposed as the inlet boundary condition. Vacuum boundary condition for neutron diffusion is used outside of the reflector.  
 
 % flux
 \begin{figure}
@@ -1066,7 +1066,7 @@ The temperatures gradient inside a fuel pebble is higher after the transient bec
 
 \section{Conclusion}
 Strict safety requirement for next-generation reactors along with the progress in computer technology prompts the development, qualification and application of time-dependent multiphysics models for nuclear reactors.
-In this paper has developed a methodology for building coupled neutronics/thermal-hydraulics model for FHRs based on multi-group neutron diffusion and porous media CFD, with a multi-scale treatment. The model provides high resolution two dimensional or three dimensional results within a reasonable amount of time on a computer with 16.0 GB RAM and four Intel Core equipped with i7-4790K CPU at 4.00 GHz.
+In this paper has developed a methodology for building coupled neutronics/thermal-hydraulics model for FHRs based on multigroup neutron diffusion and porous media CFD, with a multiscale treatment. The model provides high resolution two dimensional or three dimensional results within a reasonable amount of time on a computer with 16.0 GB RAM and four Intel Core equipped with i7-4790K CPU at 4.00 GHz.
 
 In conventional porous media formulation, only an average temperature inside the solid phase is computed. This is a reasonable assumption in steady state cases and in most slow transient problems where the fuel kernel temperature is very close to the temperature of the surrounding graphite matrix. However, in the case of fast transients involving large power excursions, the difference between fuel and graphite temperatures can be significant. Thus a detailed temperature profile inside the fuel pebbles and TRISO fuel kernels is necessary for accurately computing temperature, which is important in capturing the Doppler temperature reactivity feedback.
 Overall, the power excursion in response to either a large reactivity insertion or a overcooling transient is dampened when a temperature profile in the fuel element is used, because the temperature reactivity feedback is captured more realistically at the place where the largest feedback occurs.
