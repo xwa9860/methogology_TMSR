@@ -415,6 +415,11 @@ where r is the radius of TRISO particles.
 
 The model is implemented in COMSOL Multiphysics, a software package that solves systems of partial differential equations (PDEs) or ordinary differential equations (ODEs) using the Finite Element Method (FEM), by finding a solution composed of the sum of the product of shape functions and associated coefficients. 
 
+Multigroup neutron diffusion equations are implemented in COMSOL as user defined PDEs, with the homogenized group constants for each regions defined as input. The thermal-hydraulics model is implemented in COMSOL as well, so that the multiphysics equation system can be solved in a fully coupled fashion. 
+
+The group constants that are used by the diffusion models are generated from a Serpent model for the TMSR SF-1 core with explicit representation of randomly packed TRISO particles and fuel pebbles, with the locations given by Discrete Element Method (DEM) computation, although studies\cite{Fratoni2007} have shown that the packing configuration does not affect the results, provided the packing fraction is preserved when pebbles near the wall are cut arbitrarily by the geometry definition. 
+In order to automate the process and to ensure reproducibility of the results, a MATLAB code is developed to read data from Serpent output files, fit the parameters to the respective functions of reactor conditions, and input the group constants into COMSOL. 
+
 After defining the geometry, input parameters and physics, the equation system is solved with a sequence of eigenvalue, steady state and time dependent solvers. 
 It starts by searching for the eigenvalue of the neutronic system and the corresponding neutron flux and power distribution , with cross-sections computed from an initial guess of the temperatures. An eigenvalue solver evaluate the fluxes and power density values (Equation \ref{eq:powerdensity}) on an arbitrary scale, so the power density is normalized onto the operation power for the subsequent steady state solver, as shown in equation \ref{eq:scale}.  
 
@@ -515,7 +520,8 @@ As shown in Figure~\ref{fig:TMSR}, the TMSR SF-1 core measures 285~cm in diamete
 \end{table}
 
 
-TMSR SF-1 uses the same 6.0~cm fuel pebbles as those in the helium gas cooled high-temperature reactor (HTR), that contain a 5.0~mm thick graphite shell and the enclosed TRISO particles in a graphite matrix, as shown in figure \ref{fig:triso}. The dimension and material composition of the TMSR fuel element can be found in table \ref{tab:tmsr_pb}. As the figure also shows, the TRISO particles are made of multiple layers with detailed dimensions listed in table \ref{tab:tmsr_triso}. 
+TMSR SF-1 uses the same 6.0~cm fuel pebbles as those in the helium gas cooled high-temperature reactor (HTR), that contain a 5.0~mm thick graphite shell and the enclosed TRISO particles in a graphite matrix, as shown in Figure~\ref{fig:triso}. The dimension and material composition of the TMSR fuel element can be found in Table~\ref{tab:tmsr_pb}. As the figure also shows, the TRISO particles are made of multiple layers (with detailed dimensions listed in Table~\ref{tab:tmsr_triso}).
+
 \begin{table}
   \begin{tabular}[h]{ccccc}
     Region&Material&Thickness/Radius&Density&Conductivity\\
@@ -546,14 +552,25 @@ TMSR SF-1 uses the same 6.0~cm fuel pebbles as those in the helium gas cooled hi
 \end{table}
 
 
+TMSR SF-1 adopts a once-through fuel cycle. At the start of a fuel cycle, the pebbles are loaded individually from the bottom of the core into the flibe salt until the core reaches criticality, with about 11,000 fresh fuel pebbles. Fuel pebbles are buoyant in the salt and fills the upper region. The bottom of the fuel pebble bed has a cone shape with an angle depending on the loading conditions. The lower region of the core is left with flibe salt.
 
+The primary coolant (enriched liquid flibe) enters the core from the bottom at a nominal inlet temperature of 672\degc\ and flows upward across the pebble region with a nominal outlet temperature of coolant is 700\degc. The heat is then transported to the secondary loop through a heat exchanger for electricity production. The thermal properties of the flibe coolant is in Table \ref{tab:flibe}. 
 
-
-
-TMSR SF-1 adopts a once-through fuel cycle, which although may not be the most economical approach comparing to online refueling, it is less demanding on the pebble handling system and is easier for predicting fuel composition in the core.
-At the start of a fuel cycle, the pebbles are loaded individually from the bottom of the core into the flibe salt until the core reaches criticality, with about 11,000 fresh fuel pebbles. Fuel pebbles are buoyant in the salt and fills the upper region. The bottom of the fuel pebble bed has a cone shape with an angle depending on the pebble/fluid interaction. The lower region of the core is left with flibe salt.
-
-The primary coolant (enriched liquid flibe) enters the core from the bottom at a nominal inlet temperature of 672\degc\ and flows upward across the pebble region with a nominal outlet temperature of coolant is 700\degc. The heat is then transported to the secondary loop through a heat exchanger for electricity production. 
+\begin{table}
+  \caption{Flibe salt thermo-physical properties.}
+  \centering
+  \begin{tabular}{lc}
+    \hline
+    Property & Value\\
+    \hline
+    Viscosity, kg/m.s & 1.16E-4*e$^{3755/T[K]}$\\
+    Heat capacity, J/kg/K & 2386\\
+    Thermal conductivity, W/m/K & 1.1\\
+    Density, kg/m$^3$ & 2413 - 0.488T[K]\\
+    \hline
+  \end{tabular}
+\label{tab:flibe}
+\end{table}
 
 The TMSR SF-1 core is surrounded by an outer graphite reflector, which provides neutron moderation and reflection that flattens the radial power distribution and improves neutron economy. It also hosts various channels for neutron sources, salt and pebble loading and instrumentation, as well as the 16 control rods for reactivity control.
 
@@ -578,11 +595,8 @@ As shown in Figure \ref{fig:model_geom}, the multi-physics reactor core model is
   \label{fig:model_geom}
 \end{figure}
 
-Multigroup neutron diffusion equations are implemented into COMSOL as user defined PDEs, with the homogenized group constants for each regions defined as input. 
-The group constants that are used by the diffusion and $SP_N$ models are generated from a Serpent model for the TMSR SF-1 core with explicit representation of randomly packed TRISO particles and fuel pebbles, with the locations given by Discrete Element Method(DEM) computation, although studies\cite{Fratoni2007} have shown that the packing configuration does not affect the results, provided the packing fraction is preserved when pebbles near the wall are cut arbitrarily by the geometry definition. 
 
-In order to automate the process and to ensure reproducibility of the results, a MATLAB code is developed to read data from Serpent output files, fit the parameters to the respective functions of reactor conditions, and input the group constants into COMSOL. The code is set up for any user defined group structures and the one that is used in the current models is shown in table \ref{tab:egroup}. The eight-group energy structure is chosen to capture the cross section features of the major isotopes: U-235, U-238, and those in flibe. Figure \ref{fig:xs_isotope} shows the normalized spectrum in different reactor zones and the scattering, fission, absorption and (n, 2n) cross sections of the major isotopes, in superposition of the currently used group structure. 
-
+ 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{./images/diffusion/tmsr/isotope_XS.png}
@@ -609,30 +623,12 @@ In order to automate the process and to ensure reproducibility of the results, a
   \label{tab:egroup}
 \end{table}
 
-The thermal-hydraulics model is implemented in COMSOL as well, so that the multiphysics equation system can be solved in a fully coupled fashion. 
-The model uses thermal property values in Table \ref{tab:flibe} for flibe coolant and graphite reflector. The homogenized pebble-wise properties and the properties of each layer of the fuel elements are listed in Table \ref{tab:TRISO_prop} and Table \ref{tab:pb_prop}. These nominal values are used in most of the models where the variation in thermo-physical properties for solid materials are not significant within the range of the temperature change. 
 
 
 
-\begin{table}
-  \caption{Flibe salt thermo-physical properties.}
-  \centering
-  \begin{tabular}{lc}
-    \hline
-    Property & Value\\
-    \hline
-    Viscosity, kg/m.s & 1.16E-4*e$^{3755/T[K]}$\\
-    Heat capacity, J/kg/K & 2386\\
-    Thermal conductivity, W/m/K & 1.1\\
-    Density, kg/m$^3$ & 2413 - 0.488T[K]\\
-    \hline
-  \end{tabular}
-\label{tab:flibe}
-\end{table}
-
+The code is set up for any user defined group structures and the one that is used in the current models is shown in table \ref{tab:egroup}. The eight-group energy structure is chosen to capture the cross section features of the major isotopes: U-235, U-238, and those in flibe. Figure \ref{fig:xs_isotope} shows the normalized spectrum in different reactor zones and the scattering, fission, absorption and (n, 2n) cross sections of the major isotopes, in superposition of the currently used group structure. 
 
 To model the flow field and heat transfer in the pebble bed, porous media approach computes a liquid temperature and a fuel temperature at each point in the region and connect the two phases through convective heat transfer. The fuel temperature is of prime important in FHR transient response because of the large Doppler temperature reactivity feedback. Therefore, multiscale temperature treatment is implemented for a more realistic representation of the feedback from fuel temperature changes. 
-
 Temperature inside fuel pebbles are computed in three subdivided fuel layers, and likewise the fuel kernel in the TRISO particles are divided into three sub-layers, for which temperatures are tracked during a transient and are used to compute fuel region macroscopic cross-sections. In order to save computational cost, the coatings are combined into a non-heat-generating layer with equivalent heat transfer properties. The effects of this treatment on the response to reactivity insertion and overcooling transients are discussed further in section \ref{sec:TMSR_transients} when we analyze the TMSR transient behaviors.
 
 A vacuum boundary condition is applied at the outer surfaces of the reflector. And a symmetry boundary condition is used at the core center-line in 2-D axi-symmetrical models.
@@ -662,10 +658,12 @@ Finer mesh provides more accurate results but also requires more computer resour
 \subsection{Model verification}
 Code-to-code comparison is crucial for code verification when experimental data is lacking. Code verification has been done in this work by comparing both steady state and time dependent results to a reference code under various conditions. 
 
-The reference model \cite{Aufiero2016} uses Serpent for neutron transport and OpenFOAM for CFD modeling. These two codes are internally coupled for best computation performance. To model the reactor core as realistic as possible, the random packing of TRISO particles and fuel pebbles are also simulated, using discrete element method (DEM). The reference model can computes three dimensional distribution of power, temperature, neutron flux, as well as global parameters such as $k_{eff}$, temperature reactivity feedback coefficients. 
+The reference model \cite{Aufiero2016} uses Serpent for neutron transport and OpenFOAM for CFD modeling to compute three dimensional distribution of power, temperature, neutron flux, as well as global parameters such as \keff\ , temperature reactivity feedback coefficients. These two codes are internally coupled for best computation performance. To model the reactor core as realistic as possible, the random packing of TRISO particles and fuel pebbles are also simulated, using discrete element method (DEM). 
 Serpent solves the neutron transport equation in integral form using continuous energy nuclear data with few approximations, therefore it produces valuable reference results for code-to-code verification where experimental data are not available. 
 
 \subsubsection{Power distribution comparison}
+Isothermal condition, whereby the core is maintained at uniform temperature by external heat source, is a good starting point for code-to-code comparison for the neutronic modules as they do not require coupling with thermal-hydraulics. In order to verify the reliability of the neutronic modules, the power density distribution is computed.
+Figure \ref{fig:power_comp} shows the steady state power distribution on a 2.0~cm x 2.0~cm mesh, the result from the COMSOL model on the left and that from the reference model on the right, both normalized such that the full core integration is unity.
 \begin{figure}
   \centering
   \includegraphics[width=0.35\columnwidth]{./images/benchmark/comsol_power.png}
@@ -674,10 +672,6 @@ Serpent solves the neutron transport equation in integral form using continuous 
   \label{fig:power_comp}
 \end{figure}
 
-Isothermal condition, whereby the core is maintained at uniform temperature by external heat source, is a good starting point for code-to-code comparison for the neutronic modules as they do not require coupling with thermal-hydraulics. In order to verify the reliability of the neutronic modules, the power density distribution is computed.
-
-
-Figure \ref{fig:power_comp} shows the steady state power distribution on a 2.0~cm x 2.0~cm mesh, the result from the COMSOL model on the left and that from the reference model on the right, both normalized such that the full core integration is unity. 
 Satisfying similarity has been found between the results. The diffusion-based model captures the boundary effect of the reflector adequately despite the fundamental flaw of the diffusion assumption in vicinity of the boundaries. However, because the individual pebbles are not explicitly modeled, the diffusion model cannot represent the local variation in power due to the discrete packing of fuel pebbles. As a result, the power profile seems smoother in the COMSOL model. 
 In a randomly packed pebble bed, the porosity is slightly higher at the center and lower at the wall because of the ordering effect. Near the walls, the Monte Carlo result shows a drop in power density due to ordered pattern of pebbles, but this can not be captured by the COMSOL model because it uses homogenized cross sections in the fuel region. The variation can be better reflected in the COMSOL model if the core is divided into multiple radial zones, with different set of cross-sections generated for each zone.
 Furthermore, the interface between the fuel pebble region and the flibe region is approximated by a straight line in the COMSOL model. This is different from the randomly packed fuel region in the reference model but can be calibrated for a better match. 
@@ -815,9 +809,8 @@ After careful code-to-code verification for the multi-physics model, parameters 
     \label{fig:ss_res_flux}
 \end{figure}
 
-An eight-group energy structure is used in the neutron diffusion equations but the neutron flux values are regrouped into thermal ([0.00E+00, 5.00E-07] MeV) and fast ([5.00E-07, 1.40E+00] MeV) regions for plotting purpose. As confirmed by the plots, fast neutrons are generated exclusively from nuclear reactions in the fuel region and are then scattered by the matters in the core as they get thermalized. 
+An eight-group energy structure is used in the neutron diffusion equations but the neutron flux values are regrouped into thermal ([0.00E+00, 5.00E-07] MeV) and fast ([5.00E-07, 1.40E+00] MeV) regions for plotting purpose. As confirmed by the plots in Figure \ref{fig:ss_res_flux}, fast neutrons are generated exclusively from nuclear reactions in the fuel region and are then scattered by the matters in the core as they get thermalized. 
 The moderation effect of the coolant is dwarfed by that of the graphite reflector in TMSR. As a result, a large portion of thermal neutrons is found inside the reflector, besides the center of the core.
-
 The thermal neutrons that travel back from the reflector to the fuel region cause a peak in power density near the border as they trigger nuclear reactions. 
 
 % power
@@ -891,12 +884,12 @@ The fuel temperature distribution resembles the power profile: hottest in the ce
 The coolant enters the bottom of the core at 672$^{\circ}C$ and gradually heats up to 708$^{\circ}C$ as it flows through the fuel region.
 Because of the large volumetric heat capacity of flibe, the coolant is a very efficient heat carrier in TMSR. Both coolant and fuel have large temperature margin below safety limit, which makes TMSR core very robust to transients.
 
-Under the standard porous media model, a fluid temperature and a solid temperature are computed at each two dimensional points in the core. Beyond this, the multiscale treatment in the model tracks the heat transfer inside solid fuel elements and computes a set of temperatures that represents the temperature profile at various depth of the fuel elements. The resulting temperatures with or without the multiscale treatment at steady state are compared in figure \ref{fig:tmsr_temp_ss} and \ref{fig:tmsr_temp_non_ms_ss}.
+Under the standard porous media model, a fluid temperature and a solid temperature are computed at each two dimensional points in the core. Beyond this, the multiscale treatment in the model tracks the heat transfer inside solid fuel elements and computes a set of temperatures that represents the temperature profile at various depth of the fuel elements. The resulting temperatures with or without the multiscale treatment at steady state are compared in Figure~\ref{fig:tmsr_temp_ss} and Figure~\ref{fig:tmsr_temp_non_ms_ss}.
 At steady state, it is assumed that all the nuclear power is generated in the fuel and is transported to coolant and subsequently to the secondary loop through heat exchangers. Therefore, the coolant temperature profile are very similar with or without the multiscale treatment in fuel. 
 Because of the large volumetric heat capacity of flibe, the coolant is a very efficient heat carrier in FHRs.
 The coolant enters the bottom of the TMSR SF-1 core at 672$^{\circ}C$, as imposed by the inlet boundary condition, and gradually heats up to, on average, 705$^{\circ}C$ as it flows through the fuel region.
 
-Among all the temperatures computed in the solid fuel elements, only the coldest (in the pebble shell) and the hottest (in the center layer of TRISO particles) temperature in a pebble are shown in figure \ref{fig:tmsr_temp_ss} as the upper and lower bound of the solid phase temperatures. The temperature distribution in the center of the TRISO particles resembles the power profile: hottest in the center of the core and coldest at the two axial extremities, within a range between 710 and 790 $^{\circ}C$. 
+Among all the temperatures computed in the solid fuel elements, only the coldest (in the pebble shell) and the hottest (in the center layer of TRISO particles) temperature in a pebble are shown in Figure \ref{fig:tmsr_temp_ss} as the upper and lower bound of the solid phase temperatures. The temperature distribution in the center of the TRISO particles resembles the power profile: hottest in the center of the core and coldest at the two axial extremities, within a range between 710 and 790 $^{\circ}C$. 
 The surface temperature is, on the other hand, affected both by the nuclear power and by the coolant flowing upward across the core and shifting the peak temperature upward. The hottest fuel surface temperature is attained at the top of the core, where the coolant is the hottest. 
 
 
@@ -905,7 +898,8 @@ Overall, both the coolant and the fuel are far below their respective safety lim
 
 
 
-
+%-------------------------------------------------------------------------------------------------------------------------
+% Transient
 \section{TMSR SF-1 transient analysis}
 \label{sec:TMSR_transients}
 
@@ -916,8 +910,6 @@ In the multiscale case, the average fuel temperature is computed as a volume ave
 
 
 \subsection{Reactivity insertion transients}
-
-
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/diffusion/tmsr/RI/compare_multiscale/power.png}
@@ -960,7 +952,7 @@ The peak fuel temperature in the multiscale case is higher at steady state, beca
 Overall, the conventional model overestimates the temperature increase in the coolant and in the average fuel temperature, whereas it underestimates the peak fuel temperature. However, when comparing the results, we need to keep in mind of the uncertainties introduced by the material properties used in both approach. In fact, pebble wise average properties are used in the non-multiscale case, whereas more detailed layer wise properties are used in the multiscale case, and large uncertainties are associated with the measurement of all these values. A large variation exists in the limited literature on TRISO fuel pebble thermal properties measurements. In addition, to simplify the computation, the outer non-power-generating layers in TRISO particles are combined into one, with an equivalent conductivity computed from the properties of the substituting materials. 
 The contact resistance at the interfaces of the layers are not taken into account when computing the equivalent properties because of lack of available measurements. 
 
-To evaluate the sensitivity of the results to the material properties, in particular thermal conductivity values of the fuel elements, figure \ref{fig:temps_TMSR} shows the core average temperatures in each TRISO and pebble layer during the 1\$ reactivity insertion transient, with either nominal material properties (table \ref{tab:triso_prop_tmsr1} and table \ref{tab:pb_prop_tmsr1}) or an uniform thermal conductivity (193 W/m.K, a typical value for nuclear graphite material) for each layer. 
+To evaluate the sensitivity of the results to the material properties, in particular thermal conductivity values of the fuel elements, figure \ref{fig:temps_TMSR} shows the core average temperatures in each TRISO and pebble layer during the 1\$ reactivity insertion transient, with either nominal material properties or an uniform thermal conductivity (193 W/m.K, a typical value for nuclear graphite material) for each layer. 
 In each individual TRISO particle, the center is the hottest and the temperature decreases as the heat diffuses out of the fuel material. With the nominal properties, a large temperature drop occurs at the coating due to the buffer layer. The buffer layer in a TRISO particle has a porous structure that serves as a damper to the stress caused by gaseous fission production. The porous nature of this layer makes it a thermal insulator and sets the lower bound of the conductivity. The buffer layer has the most temperature variation compare to the other layers.
 In both cases, the temperatures deviate further from each other during the transient, because of the elevated power level. And the temperatures are further apart with the nominal thermal conductivity values.   
 
@@ -973,7 +965,7 @@ In both cases, the temperatures deviate further from each other during the trans
 \end{figure}
 
  
-\newpage
+
 As discussed before, the multiscale treatment is important in capturing the correct feedback behaviour, so the results shown hereafter are with the treatment.  
 Figure \ref{fig:RI_pcm} shows the power and temperature evolution during a 1\$ or 0.5\$ reactivity insertion. 
  During the 1\$ prompt insertion transient, the core maximum fuel temperature is 1500$^{\circ}C$, below the safety limit(1600$^{\circ}C$). 
@@ -1003,8 +995,7 @@ Figure \ref{fig:RI_time} shows the effect of the timescale of the reactivity ins
 
 
 
-
-\newpage
+%-------------------------------------------------------------------------------------------------------------------------
 \subsection{Overcooling transients}
 
 \begin{figure}[h]
@@ -1065,29 +1056,26 @@ Overall, the end state of the fuel temperature is lower while the coolant temper
 In fact, the estimated maximum flibe temperature in this case is much higher than in the multiscale case, even higher than the steady state value. This may lead to over conservatism in the design. 
 
 
-If we take a closer look at the temperature profile inside the fuel pebbles during the transient, figure \ref{fig:temps_OC_tmsr} shows the temperature in each solid layer at each time stamp.
+If we take a closer look at the temperature profile inside the fuel pebbles during the transient, Figure \ref{fig:temps_OC_tmsr} shows the temperature in each solid layer at each time stamp.
 It takes a few seconds for the drop in the inlet coolant temperature to affect the solid temperature. The core-wise average temperatures in the fuel elements decrease at first as the cold coolant flows upward in the core.
 At around 50 second, the temperatures increase due to the surge in power. The temperatures finally stabilize after about 150 seconds. The surface temperature is much lower than the steady state temperature because the coolant temperature is much lower.
 The temperatures gradient inside a fuel pebble is higher after the transient because the power is at a higher level. The difference between the hottest layer and the shell changed from 60 K to 130 K after the transient. As a result, the inner most layer has a slightly higher temperature after the transients, although the safety margin to fuel damage is still very large. 
 
 
 \section{Conclusion}
-Strict safety requirement for next-generation reactors along with the progress in computer technology prompts the development, qualification and application of time-dependent multi-physics models for FHRs.
-In this paper, a methodology for building coupled neutronics/thermal-hydraulics model for FHRs is described. It utilizes COMSOL Multiphysics to solve for neutron diffusion, delayed neutron precursor concentration equations and porous media CFD. Benchmarking with the Monte Carlo based model shows satisfying agreement. The model provides high resolution two dimensional or three dimensional results within a reasonable amount of time on a computer with 16.0 GB RAM and four Intel Core equipped with i7-4790K CPU at 4.00 GHz.
-
-The Fick's law assumption in diffusion models does not take directional variations in neutron transport into account, and this assumption is violated in strong absorbers such as control rods. Furthermore, $SP_N$ treatment can be used in regions where the diffusion assumption is questioned, such as in the vicinity of the control rods.
-This section describes a control rods modeling method based on the $SP_3$ approximation of NTE that is more accurate than the diffusion approximation, especially in control rod regions, and yet is considerably less expensive than the discrete ordinates ($S_N$) or spherical harmonics ($P_N$) approaches. In addition, the $SP_3$ equations can be solved in the same manner as the diffusion equations, which allows similar implementations with the same tools.
+Strict safety requirement for next-generation reactors along with the progress in computer technology prompts the development, qualification and application of time-dependent multiphysics models for nuclear reactors.
+In this paper has developed a methodology for building coupled neutronics/thermal-hydraulics model for FHRs based on multi-group neutron diffusion and porous media CFD, with a multi-scale treatment. The model provides high resolution two dimensional or three dimensional results within a reasonable amount of time on a computer with 16.0 GB RAM and four Intel Core equipped with i7-4790K CPU at 4.00 GHz.
 
 In conventional porous media formulation, only an average temperature inside the solid phase is computed. This is a reasonable assumption in steady state cases and in most slow transient problems where the fuel kernel temperature is very close to the temperature of the surrounding graphite matrix. However, in the case of fast transients involving large power excursions, the difference between fuel and graphite temperatures can be significant. Thus a detailed temperature profile inside the fuel pebbles and TRISO fuel kernels is necessary for accurately computing temperature, which is important in capturing the Doppler temperature reactivity feedback.
-Overall, the power excursion in response to either a large reactivity insertion or a overcooling transient is dampened when a temperature profile in the fuel element is used, because the temperature reactivity feedback is captured more realistically at the place where the largest feedback occurs. 
+Overall, the power excursion in response to either a large reactivity insertion or a overcooling transient is dampened when a temperature profile in the fuel element is used, because the temperature reactivity feedback is captured more realistically at the place where the largest feedback occurs.
 
-
-Although the results discussed in this paper are based on a specific FHR design - the TMSR, the methodology can be used for all pebble bed FHRs.
-
+The methodology has been applied to the TMSR SF-1. 
+Although the results discussed in this paper are based on a specific FHR design, the methodology can be used for all pebble bed FHRs.
 Steady state and transient results of power, temperatures and neutron flux are discussed in this paper. The use of thermal resistant TRISO fuel, flibe coolant and graphite reflectors renders the core extremely robust against accidents. 
 Because of the use of highly robust elements in the core, failures due to high temperature would be more likely to occur at the hot legs outside the core.
 The fuel and coolant temperature during a 1\$ reactivity insertion is within the safety limit.
 Likely, during the overcooling transient, where the coolant inlet temperature is dropped by 100 $^{\circ}C$ in 10 seconds, the core-wise maximum fuel temperature is 950 $^{\circ}C$, largely below the safety limit for fuel element. The coolant temperature stabilizes at a lower level than the initial condition, but is still above the salt freezing point.
+
 
 
 \section*{References}
