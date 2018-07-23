@@ -243,10 +243,9 @@ The change in macroscopic cross-sections in the flibe region is mainly due to th
 where $\hat{\Sigma}(\rho_{flibe})$ is the estimation of a flibe macroscopic cross-section, $\rho_{flibe}$ is the flibe density that depends on the temperature, $\rho_0$ is the flibe density at nominal temperature, and 
 $c_0$ and $c_1$ are the constants to be calculated.
 
-Unlike the liquid salt coolant, the solid fuel do not change shape or density in the range of the considered temperatures. The fuel temperature reactivity feedback (also called the Doppler feedback) is mainly due to the Doppler broadening of the microscopic cross-sections of the fuel material.
-Therefore, the fuel cross-sections are described by a linear-log function of the fuel temperature. During fast transients such as reactivity induced accidents, the heat does not have time to reach the coolant. The core relies on the temperature reactivity feedback from the fuel inside the TRISO particles to stabilize. It is important to compute the temperature distribution inside TRISO particles and fuel pebbles, and use the temperatures at different depth to compute cross-sections. 
-
-A multiscale cross-section is express as a linear combination of the logarithm of fuel temperatures. 
+Unlike liquid salt, the solid fuel elements do not change shape or density in the considered temperature range. 
+The change in fuel cross-sections are mainly due to the Doppler broadening of the microscopic cross-sections of the fuel material and exhibit a linear-log function of temperature.  It is important for FHRs to compute the temperature distribution inside TRISO particles and fuel pebbles, and use the temperature profile, instead of an average fuel temperature, to compute cross-sections, because during fast transients such as reactivity induced accidents, the heat does not have time to propagate through the fuel pebbles and to reach the coolant and therefore the core relies on the temperature reactivity feedback inside the TRISO particles to stabilize.
+A multiscale cross-section, incorporating a vector of temperatures at different depth in the fuel element, is express as a linear combination of the logarithm of fuel temperatures:
 
 \begin{equation}
 \hat{\Sigma} (T_{fuel}) = c_0 + [c_1, c_2, ... c_n] \begin{bmatrix}
@@ -260,10 +259,10 @@ A multiscale cross-section is express as a linear combination of the logarithm o
 \end{equation}
 
 
-where $\hat{\Sigma}(T_{fuel})$ is the estimation of a fuel macroscopic cross-section, $T_{fuel}$ is the temperature or temperature vector in case many temperatures affect the same cross-section, $T_{nm}$ is the temperature of the mth layer in a TRISO particle in the nth layer of a fuel pebble and $c_0$, $c_1$ are the coefficients we search for.
+where $\hat{\Sigma}(T_{fuel})$ is the estimation of a macroscopic cross-section in the fuel region, $T_{fuel}$ is the temperature or temperature vector in case many temperatures affect the same cross-section, $T_{nm}$ is the temperature of the mth layer in a TRISO particle in the nth layer of a fuel pebble and $c_0$, $c_1$ are the coefficients we search for.
 
 \subsection{Thermal-hydraulics}
-Direct CFD modeling of the flow passage formed by more than 10000 pebbles is not practical with current computation capacity. Porous media model requires considerably less computational resource and is used in the multi-physics model.
+Direct CFD modeling of the flow passage formed by more than 10000 pebbles is not practical with current computation capacity. The porous media approach, on the other hand, requires considerably less computational resource and is used in the multi-physics model.
 
 An important parameter for porous media is the porosity, $\epsilon$, defined as the ratio between the volume of the void to the total volume (Equation \ref{eq:pf}). It appears in the mass (Equation \ref{eq:mass}), momentum (Equation \ref{eq:mmtm}) and energy conservation equations (equations \ref{eq:pm_liq} and \ref{eq:pm_sol}) below. Local variation in porosity in a pebble bed, including the drop near the wall due to ordered packing, is not modeled explicitly in the porous media model, but the empirical correlations for pressure loss and heat transfer coefficient incorporate corrections for wall effect.
 
@@ -355,7 +354,7 @@ The energy equations for fluid and solid phases are given in equations \ref{eq:p
 
 In the energy equations, $\rho c_p$ is the volumetric heat capacity in $Jm^3K^{-1}$, $T_f$ and $T_s$ are respectively the fluid temperature and the solid temperature in K, $k_f$ is the fluid thermal conductivity in $Wm^{-1}K^{-1}$, a is the specific surface area in $m^{-1}$, q is the heat generation in $Wm^{-3}$.
 
-In a typical nuclear reactor, 97\% of the energy is deposited in the fuel while the rest is transferred to coolant, reflectors and even shield by long range particles such as neutrons and gammas. 
+In a typical nuclear reactor, 97\% of the energy is deposited in the fuel while the rest is transported in coolant, reflectors and even shield by long range particles such as neutrons and gammas. 
 In the current model, nuclear power is assumed generated inside the solid medium of the fuel region and transferred to the coolant through heat convection. Conservative adiabatic boundary condition is applied at the reflector walls. Reflectors have separate coolant channels to maintain the temperature and temperature in outer layers such as graphite reflectors and stainless steel containment has negligible effect on neutronics behaviour, therefore their temperatures are not computed in the coupled simulation. However, it can be computed using the coupled simulation results as boundary conditions.
 
 In a porous media model, the convective heat transfer between the fuel pebbles and the coolant is computed from empirical correlations, whose validation affects directly the credibility of the results. The Wakao correlation (equation \ref{eq:wakao}) \cite{Wakao1979} calculates the convective heat transfer coefficient between pebbles and coolant, with Pr and Re the Prandtl and Reynolds numbers.
