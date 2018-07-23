@@ -132,9 +132,9 @@
 
 
 \begin{abstract}
-Fluoride-salt-cooled High-temperature Reactor(FHR) is one of the generation IV reactor designs that promises great safety and market competitiveness because of its unique combination of TRISO fuel elements, liquid salt coolant and graphite reflectors. This paper describes methodologies for developing fully coupled neutronics and thermal hydraulics models for FHRs to incorporate its novel design features, such as the double heterogeneity in the fuel elements. 
+The unique combination of TRISO fuel elements, liquid salt coolant and graphite reflectors in Fluoride-salt-cooled High-temperature Reactors (FHRs), one of the generation IV reactor designs, promises great safety and market competitiveness, but at the same time poses challenges for numerical modeling. This paper describes methodologies for developing fully coupled neutronics and thermal hydraulics models for a FHR core that incorporates its novel design features, such as the double heterogeneity in the fuel elements. 
  
- To demonstrate its ability to accurately predict the dynamic behavior of a FHR core during postulated transients, which is important for FHR technology development and licensing, an example model is built for the Thorium Melten Salt Reactor Solid Fuel - 1 (TMSR SF-1) design and results from eigenvalue, steady state and transient studies are extensively verify against a Monte Carlo neutron tranport and CFD based reference code.
+ To demonstrate the ability of the models to accurately predict the dynamic behavior of a FHR core during postulated transients, which is important for FHR technology development and licensing, a case study is presented based on a solid fuel Thorium Molten Salt Reactor (TMSR-SF1) design. Comparison of results from eigenvalue, steady state and transient studies with a Monte Carlo neutron tranport and CFD based reference code shows satisfying matches.
  
 \end{abstract}
 
@@ -148,12 +148,12 @@ Fluoride-salt-cooled High-temperature Reactor(FHR) is one of the generation IV r
 \section{Introduction}
 \label{sec:introduction}
 The FHR technology has been pursued by the generation IV reactor community for its outstanding safety and economic performances. The use of coated particle fuel, flibe coolant and graphite reflectors allows a FHR core to operate at high temperature and low pressure, which improves the power conversion efficiency, enables process heat generation and boosts the market competitiveness. 
-The ability of accurately predict the core behavior during both steady state and transient scenarios is crucial for design optimization and safety demonstration of novel reactors.
+The ability of accurately predict the core behavior during both steady state and transient scenarios is crucial for its design optimization and safety demonstration of novel reactors.
 
 
-As illustrated in figure \ref{fig:triso}, a commercial scale reactor core would contain tens of thousands fuel pebbles and within each thousands of TRISO particles that enclose the fuel material. This peculiar geometry poses unique challenges to both neutronics and thermal-hydraulics modeling. 
+As illustrated in figure \ref{fig:triso}, a commercial scale reactor core would contain tens of thousands fuel pebbles and within each thousands of TRISO particles that enclose the fuel material. This peculiar geometry poses unique challenges to both neutronics and thermal-hydraulics modeling, known as the double heterogeneity effect. 
 
-Reactor-agnostic Monte Carlo methods can model the particles and pebbles explicitly as the way they are manufactured with the locations given by Discrete Element Method(DEM) computation, although studies\cite{Fratoni2007} have shown that the packing configuration does not affect the results, provided the packing fraction is preserved when pebbles near the wall are cut arbitrarily by the geometry definition. But this approach require a large number of source neutrons to achieve desired statistical accuracy, which implies expensive computational cost, especially for transient analysis. Monte Carlo codes are used in practice to generated cross-sections for deterministic codes and to provide reference results for code verification. Deterministic codes, in the contrary, model the fuel region as homogenized medium with equivalent cross-sections. In particular, diffusion equations can compute two-dimensional or three-dimensional neutron behaviour with reasonable computational cost and accuracy, even though limitations can be found in vicinity of control rods, burnable poisons, and other abrupt discontinuities.
+Reactor-agnostic Monte Carlo methods can model the particles and pebbles explicitly as the way they are manufactured, but this approach require a large number of source neutrons to achieve desired statistical accuracy, which implies high computational cost, especially for transient analysis. In view of the advantages and disadvantages, Monte Carlo codes are mainly used in practice to generated cross-sections for deterministic codes and to provide reference results for code verification. Deterministic methods, in the contrary, model the fuel region as homogenized medium with equivalent cross-sections. In particular, diffusion equations can model two-dimensional or three-dimensional full core neutronic behaviour with reasonable computational cost and accuracy, even though limitations can be found in vicinity of control rods, burnable poisons, and other abrupt discontinuities.
 
 \begin{figure}
   \centering
@@ -162,13 +162,13 @@ Reactor-agnostic Monte Carlo methods can model the particles and pebbles explici
   \label{fig:triso}
 \end{figure}
 
-The question of how to model the complex geometry of the flow passage in a pebble bed has been tackled in chemistry engineering \cite{Dixon2001}\cite{Miroliaei2011} for fixed bed reactors in chemical processes and in nuclear engineering for pebble bed reactor designs.  One-dimensional heat conduction simplification is often used in Light Water Reactor (LWR) fuel rods and can be used in spherical fuel elements for FHRs for quick scope analysis, but is inadequate for detailed investigation because it ignores temperature gradients in the axial and the radial direction, which can be significant in a FHR core with cross flow. Two main approaches for full core CFD modeling are realistic modeling and porous media modeling. Realistic modeling has been used to model flow passage directly in a segment of pebbles, from several to several hundreds \cite{Lee2007}\cite{Hassana}\cite{Shams2013}, but quickly becomes unfeasible for a large number of pebbles with the current computation resources. In addition, although the goal of realistic modeling is to model the flow passage realistically, it is not free of assumptions \cite{Lee2007}. For example pebble packing structure and contact point treatment are often used to reduce computational cost. The porous media approach, on the other hand, computes only the average flow conditions with ten time less mesh grids. Comparisons between the direct CFD and porous media methods\cite{Wu2010} suggest that porous media methods provide similar averaged pressure and temperature gradient across the pebble bed to the realistic approach, given the appropriate Darcy-Forchheimer drag model is used. Porous media approach has been used in standard HTR modeling tools Thermix \cite{Struth1985} and Tinte \cite{Gerwin1987}, as well as in a thermal-hydraulics model for FHR \cite{Scarlat2012}.
+The question of how to model the complex geometry of the flow passage in a pebble bed has been tackled in chemistry engineering \cite{Dixon2001}\cite{Miroliaei2011} for fixed bed reactors in chemical processes and in nuclear engineering for pebble bed reactor designs.  The one-dimensional heat transfer simplification is often used in Light Water Reactor (LWR) fuel rods and can be used in spherical fuel elements for FHRs for quick scope analysis, but is inadequate for detailed investigation because it ignores temperature gradients in the axial and the radial direction, which can be significant in a FHR core with cross flow. Two main approaches for full core CFD modeling are realistic modeling and porous media modeling. Realistic modeling has been used to model flow passage directly in a segment of pebbles, from several to several hundreds \cite{Lee2007}\cite{Hassana}\cite{Shams2013}, but quickly becomes unfeasible for a large number of pebbles with the current computation resources. In addition, although the goal of realistic modeling is to model the flow passage realistically, it is not free of assumptions \cite{Lee2007}. For example pebble packing structure and contact point treatment are often used to reduce computational cost. The porous media approach, on the other hand, computes only the average flow conditions with ten time less mesh grids. Comparisons between the direct CFD and porous media methods\cite{Wu2010} suggest that porous media methods provide similar averaged pressure and temperature gradient across the pebble bed to the realistic approach, given the appropriate Darcy-Forchheimer drag model is used. Porous media approach has been used in standard HTR modeling tools Thermix \cite{Struth1985} and Tinte \cite{Gerwin1987}, as well as in a thermal-hydraulics model for FHR \cite{Scarlat2012}.
 Appropriate safety margin should be applied in the design given the fact that porous media models do not capture local vertices, flow separation, variations in flow induced heat transfer around the pebble surface and the resulting local hot spots.
 
 Previously, researchers have developed separate codes in thermal-hydraulics \cite{Scarlat2012} and neutronics \cite{Cisneros2013} for FHRs. These codes can be coupled for multiphysics computation using the operator-split method: solving one equation system at a time and transfer data between the codes after each iteration until the results converge. However, the operator split method requires small time steps to ensure convergence due to nonlinear inconsistency \cite{Ragusa2009} and could require a substantial amount of computational resource. This work, instead, explores methodology for developing fully coupled neutronics and thermal-hydraulics models for pebble bed FHRs.  
 
 
-The rest of the paper is organized in three sections. The methodology, including governing equations, generation of cross-sections and implementation in COMSOL is discussed in section \ref{sec:methodology}. A case study based on TMSR design is then presented in section \ref{sec:res}, where model verification procedures via code-to-code comparison is presented and both steady state and transient results are discussed. Lastly, future research needs are identified and discussed in the conclusion.
+The rest of the paper is organized in three sections: the methodology, including governing equations, generation of cross-sections and implementation in COMSOL is discussed in section \ref{sec:methodology}; A case study based on TMSR design is then presented in section \ref{sec:res}, where model verification procedures via code-to-code comparison is presented and both steady state and transient results are discussed; Lastly, future research needs are identified and discussed in the conclusion.
 
 \section{Methodology}
 \label{sec:methodology}
@@ -222,34 +222,25 @@ $\Sigma_{f,g}$ = macroscopic fission cross-section of group $g$, m$^{-1}$
  G = total number of energy groups\\
  D = total number of delayed neutron precursors groups.
   
-  %\begin{align}
-  %  D_g = \frac{1}{\phi_g}\int_gD(E)\phi(E)dE = \frac{1}{3\phi_g}\int_g\frac{1}{\Sigma_{tr}(E)}\phi(E)dE
-  %\end{align}
 
-%\textbf{Eigenvalue Neutron Diffusion Equation}
 
 For criticality calculations, the effective multiplication factor \keff is inserted into the neutron balance equation to represent the variation of neutron population from one generation to the following one.
-
-% , resulting in:
-%   \begin{align}
-%     0 =& \nabla D_g \nabla \phi_g - \Sigma_{a,g}\phi_g - \sum_{\substack{1\\g'\neq g}}^G \Sigma_{s, gg'}\phi_{g} + \\\nonumber &\sum_{\substack{1\\g'\neq g}} \Sigma_{s, g'g}\phi_{g'} + \frac{\chi_{t,g}}{k_{\mathrm{eff}}}\sum_{g'=1}^G(\nu \Sigma_f)_{g'} \phi_{g'}
-%   \end{align}
 
 
 
 
 \subsubsection{Cross-section generation}
-The diffusion model uses group-averaged, component-wise neutronic constants, generated with the Monte Carlo neutron transport code.
-In order to perform transient analysis, these cross-sections need to be paramatrized as functions of reactor operating conditions, notably fuel temperature and coolant density in a FHR core, via a process called computer experiments, in which we run a Monte Carlo model with a sample of operating conditions and fits a function between the resulting cross-sections and the input data sets.
+The group-averaged, component-wise neutronic constants, used in the diffusion equations, are generated with the Monte Carlo neutron transport code Serpent using the nuclear data library ENDF/B-VII.0. 
+In order to perform transient analysis, these cross-sections need to be paramatrized as functions of reactor operating conditions via a process called computer experiments, in which one runs a Monte Carlo model with a sample of operating conditions and fits a function between the resulting cross-sections and the input data.
 
-The change in flibe cross-sections with temperature is mainly due to the change in density of liquid flibe, thus the temperature dependent function for flibe cross-sections are in the following form:
+The change in macroscopic cross-sections in the flibe region is mainly due to the change in density of liquid flibe with temperature, thus the function for flibe cross-sections are in the following form:
 
 \begin{align}
   \hat{\Sigma}(\rho_{flibe}) = c_0 + c_1(\rho_{flibe} - \rho_0)
   \label{eq:flibe_xs}
 \end{align}
 
-where $\hat{\Sigma}(\rho_{flibe})$ is the estimation of a flibe macroscopic cross-section, $\rho_{flibe}$ is the flibe density, $\rho_0$ is the nominal flibe density, and 
+where $\hat{\Sigma}(\rho_{flibe})$ is the estimation of a flibe macroscopic cross-section, $\rho_{flibe}$ is the flibe density that depends on the temperature, $\rho_0$ is the flibe density at nominal temperature, and 
 $c_0$ and $c_1$ are the constants to be calculated.
 
 Unlike the liquid salt coolant, the solid fuel do not change shape or density in the range of the considered temperatures. The fuel temperature reactivity feedback (also called the Doppler feedback) is mainly due to the Doppler broadening of the microscopic cross-sections of the fuel material.
@@ -527,7 +518,7 @@ As shown in Figure \ref{fig:model_geom}, the multi-physics reactor core model is
 \end{figure}
 
 Multigroup neutron diffusion equations are implemented into COMSOL as user defined PDEs, with the homogenized group constants for each regions defined as input. Furthermore, $SP_N$ treatment can be used in regions where the diffusion assumption is questioned, such as in the vicinity of the control rods.
-The group constants that are used by the diffusion and $SP_N$ models are generated from a Serpent model for the TMSR SF-1 core with explicit representation of randomly packed TRISO particles and fuel pebbles, using the nuclear data library ENDF/B-VII.0. 
+The group constants that are used by the diffusion and $SP_N$ models are generated from a Serpent model for the TMSR SF-1 core with explicit representation of randomly packed TRISO particles and fuel pebbles, with the locations given by Discrete Element Method(DEM) computation, although studies\cite{Fratoni2007} have shown that the packing configuration does not affect the results, provided the packing fraction is preserved when pebbles near the wall are cut arbitrarily by the geometry definition. 
 
 In order to automate the process and to ensure reproducibility of the results, a MATLAB code is developed to read data from Serpent output files, fit the parameters to the respective functions of reactor conditions, and input the group constants into COMSOL. The code is set up for any user defined group structures and the one that is used in the current models is shown in table \ref{tab:egroup}. The eight-group energy structure is chosen to capture the cross section features of the major isotopes: U-235, U-238, and those in flibe. Figure \ref{fig:xs_isotope} shows the normalized spectrum in different reactor zones and the scattering, fission, absorption and (n, 2n) cross sections of the major isotopes, in superposition of the currently used group structure. 
 
