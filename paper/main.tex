@@ -80,7 +80,7 @@
 \newcommand{\ausv}{{\ensuremath{a_{\fracor{1}{v}}}} }
 \newcommand{\covariance}[2]{\ensuremath{COV \left[ {#1} \; , {#2} \right]}}
 \newcommand{\expected}[1]{\ensuremath{E \left[ {#1} \right]}}
-
+\newcommand{\degc}{{\ensuremath{^{\circ}C}}}
 \newcommand{\basis}[2]{{\ensuremath{b_{{#1},{#2}}}} }
 \newcommand{\difffun}[2]{{\ensuremath{d_{{#1},{#2}}}} }
 \newcommand{\setbrace}[1]{\displaystyle {\left\lbrace {#1} \right\rbrace}}
@@ -415,8 +415,8 @@ where r is the radius of TRISO particles.
 
 The model is implemented in COMSOL Multiphysics, a software package that solves systems of partial differential equations (PDEs) or ordinary differential equations (ODEs) using the Finite Element Method (FEM), by finding a solution composed of the sum of the product of shape functions and associated coefficients. 
 
-After defining the geometry, input parameters and physics, the equation system is assembled and the solver sequence starts by searching for the eigenvalue in the neutronic equations (equation \ref{eq:diffusion}) with cross-sections computed from an initial guess of the temperatures. 
-With the flux distribution found by the eigenvalue solver, a stationary solver computes the temperature distribution in the core by solving the conservation equations in thermal-hydraulics modules. However, an eigenvalue solver evaluate the fluxes and power density values (equation \ref{eq:powerdensity}) on an arbitrary scale, so the power density is normalized onto the operation power in steady state solver, as shown in equation \ref{eq:scale}.  
+After defining the geometry, input parameters and physics, the equation system is solved with a sequence of eigenvalue, steady state and time dependent solvers. 
+It starts by searching for the eigenvalue of the neutronic system and the corresponding neutron flux and power distribution , with cross-sections computed from an initial guess of the temperatures. An eigenvalue solver evaluate the fluxes and power density values (Equation \ref{eq:powerdensity}) on an arbitrary scale, so the power density is normalized onto the operation power for the subsequent steady state solver, as shown in equation \ref{eq:scale}.  
 
 \begin{equation}
   \dot{P} = \sum_{g=1}^G \kappa \Sigma_{f,g} \flux _g
@@ -437,8 +437,9 @@ $\Sigma_{f,g}$ = macroscopic fission cross-section of group $g$, m$^{-1}$\\
 $\flux_{g}$ = neutron flux in the $g$-$th$ energy interval [$E_g$, $E_{g-1}$], m$^{-2}$s$^{-1}$\\
 G = total number of energy groups.
  
-Another eigenvalue search is then performed with the new cross-section set determined from the temperature distribution in stationary solver solution. 
-The two steps are repeated until the results converge, i.e. the \keff differs by less than 1~pcm between two iterations.
+Taking the neutron flux distribution found by the eigenvalue solver as an input, a stationary solver computes the temperature distribution in the core by solving the conservation equations in thermal-hydraulics modules. 
+
+Another eigenvalue search is then performed with updated cross-section set based on the temperature distribution from the stationary solver. And the two steps are repeated until the results converge, i.e. the \keff differs by less than 1~pcm between two iterations.
 
 At the end of the iteration, the fluxes are scaled so that the volume integration of the power density equals to the operating power of the reactor in simulation. Normalized delayed neutron precursor concentrations are also computed, from the normalized fluxes. The scaling factors for both are shown in the following equations:
 \begin{equation}
@@ -473,10 +474,10 @@ Once the flux and neutron precursor concentration are scaled, one can simulate t
 
 \section{Case study}
 \label{sec:res}
-The above methodolgoy is applied to a 10~MW research reactor design, the Thorium Molten Salt Reactor (TMSR) SF-1 \cite{wang2014a}, described in the following sections.
+The above methodolgoy is applied to a 10~MW research reactor design, the solid fuel Thorium Molten Salt Reactor (TMSR SF-1) \cite{wang2014a}, described in the following sections.
 
 \subsection{TMSR SF-1 design overview}
-
+As shown in Figure~\ref{fig:TMSR}, the TMSR SF-1 core measures 285~cm in diameter and 300~cm in height, and is composed with three major components: an upper region with fuel pebbles and flibe salt, a lower region with flibe salt and an outer graphite reflector region. Some key design parameters are listed in Table \ref{tab:tmsr_design}.
 
 \begin{figure}[h]
     \centering
@@ -485,12 +486,77 @@ The above methodolgoy is applied to a 10~MW research reactor design, the Thorium
     \label{fig:TMSR}
 \end{figure}
 
-The core measures 285~cm in diameter and 300~cm in height. As shown in Figure~\ref{fig:TMSR}, the TMSR core is composed with three major components: an upper region with fuel pebbles and flibe salt at 40\% packing fraction, a lower region with flibe salt and an outer graphite reflector region. 
+\begin{table}
+  \centering
+  \begin{tabular}{lc}
+     \hline\\
+     Parameter & Value \\
+     \hline\\
+     Nominal thermal power, MW & 10\\
+     TRISO packing fraction & 9\% \\
+     Uranium enrichment & 17.0\% \\
+     Flibe Li-7 enrichment & 99.99\% \\
+     Pebble diameter, cm & 6\\
+     Approximate fuel pebble number& 11000\\
+   Coolant inlet temperature, \degc& 672\\
+   Coolant outlet temperature, \degc& 700\\
+   Porosity & 40\% \\
+   Fuel region radius, m& 0.68\\
+   Coolant mass flow, kg/s & 150\\
+   %Average coolant velocity, m/s & 0.14\\
+   Height of the core (including reflector), m & 2.86\\
+   Diameter of the core (including reflector), m & 2.6\\
+   Control rods active length, m & 2.406\\
+       %Convective heat transfer coefficient, $W/m^2K$&6000\\
+     \hline\\
+  \end{tabular}
+  \caption{TMSR design parameters}
+  \label{tab:tmsr_design}
+\end{table}
 
-During normal operation, the coolant salt enters at the bottom inlet at 0.18 m/s and 672$^{\circ}C$ and flows upward. 
-Fuel pebbles are slightly buoyant in the salt and therefore fills the upper region, whereas the lower region of the core is left with flibe salt. 11558 fresh pebbles are loaded in the core in SERPENT simulation with DEM until the core is critical. An outer graphite reflector surrounds the fuel and coolant, providing neutron moderation and reflection. Independent coolant channels are implanted in the reflector to maintain its temperature. Thus the reflector does not participate in the temperature feedback during most transients except for those that involves issues in the reflector coolant channels.
 
-Tiny fuel kernel that is surrounded by four layers in a TRISO particle: a porous graphite layer that buffers the stress from gaseous fission product release and nuclear radiation induced deformation, two pyrolytic carbon layers and a silicon carbide layer to enhance structural strength and prevent radioactive release.  These particles and graphite matrix form a sphere, which is then protected by a graphite shell. 
+TMSR SF-1 uses the same 6.0~cm fuel pebbles as those in the helium gas cooled high-temperature reactor (HTR), that contain a 5.0~mm thick graphite shell and the enclosed TRISO particles in a graphite matrix, as shown in figure \ref{fig:triso}. The dimension and material composition of the TMSR fuel element can be found in table \ref{tab:tmsr_pb}. As the figure also shows, the TRISO particles are made of multiple layers with detailed dimensions listed in table \ref{tab:tmsr_triso}. 
+\begin{table}
+  \begin{tabular}[h]{ccccc}
+    Region&Material&Thickness/Radius&Density&Conductivity\\
+    &&[mm]&[g/cc]&[W/m.k] \\
+    \hline\\
+    Shell&Graphite&1&10.5&3.5\\
+    Fuel&TRISO+graphtie matrix&2&3.2&15\\
+  \end{tabular}
+  \caption{Dimensions and material properties of each layer of a fuel pebble}
+  \label{tab:tmsr_pb}
+\end{table}
+
+\begin{table}
+  \caption{Dimensions and material properties of each layer of TRISO particles.}
+  \begin{tabular}[h]{lccccc}
+    \hline
+    Region&Material&Thickness,&Density,&Conductivity,&Specific heat,\\
+    &&$10^{-6}$ m&kg/m$^3$&W/m/K&J/kg/K\\
+    \hline
+    Kernel&19.9\% UC$_{0.5}$O$_{1.5}$&250&10,500&3.5&400\\
+    Buffer&porous carbon&95&1,000&0.5&2,000\\
+    IPyC&pyrolytic carbon&40&1,900&4.0&2,000\\
+    SiC&silicon carbide&35&3,200&30&1,300\\
+    OPyC&pyrolytic carbon&40&1,900&4.0&2,000\\
+    \hline
+  \end{tabular}
+  \label{tab:tmsr_triso}
+\end{table}
+
+
+
+
+
+
+TMSR SF-1 adopts a once-through fuel cycle, which although may not be the most economical approach comparing to online refueling, it is less demanding on the pebble handling system and is easier for predicting fuel composition in the core.
+At the start of a fuel cycle, the pebbles are loaded individually from the bottom of the core into the flibe salt until the core reaches criticality, with about 11,000 fresh fuel pebbles. Fuel pebbles are buoyant in the salt and fills the upper region. The bottom of the fuel pebble bed has a cone shape with an angle depending on the pebble/fluid interaction. The lower region of the core is left with flibe salt.
+
+The primary coolant (enriched liquid flibe) enters the core from the bottom at a nominal inlet temperature of 672\degc\ and flows upward across the pebble region with a nominal outlet temperature of coolant is 700\degc. The heat is then transported to the secondary loop through a heat exchanger for electricity production. 
+
+The TMSR SF-1 core is surrounded by an outer graphite reflector, which provides neutron moderation and reflection that flattens the radial power distribution and improves neutron economy. It also hosts various channels for neutron sources, salt and pebble loading and instrumentation, as well as the 16 control rods for reactivity control.
+
 
 \subsection{Multiphysics modeling for TMSR SF-1}
 
@@ -512,7 +578,7 @@ As shown in Figure \ref{fig:model_geom}, the multi-physics reactor core model is
   \label{fig:model_geom}
 \end{figure}
 
-Multigroup neutron diffusion equations are implemented into COMSOL as user defined PDEs, with the homogenized group constants for each regions defined as input. Furthermore, $SP_N$ treatment can be used in regions where the diffusion assumption is questioned, such as in the vicinity of the control rods.
+Multigroup neutron diffusion equations are implemented into COMSOL as user defined PDEs, with the homogenized group constants for each regions defined as input. 
 The group constants that are used by the diffusion and $SP_N$ models are generated from a Serpent model for the TMSR SF-1 core with explicit representation of randomly packed TRISO particles and fuel pebbles, with the locations given by Discrete Element Method(DEM) computation, although studies\cite{Fratoni2007} have shown that the packing configuration does not affect the results, provided the packing fraction is preserved when pebbles near the wall are cut arbitrarily by the geometry definition. 
 
 In order to automate the process and to ensure reproducibility of the results, a MATLAB code is developed to read data from Serpent output files, fit the parameters to the respective functions of reactor conditions, and input the group constants into COMSOL. The code is set up for any user defined group structures and the one that is used in the current models is shown in table \ref{tab:egroup}. The eight-group energy structure is chosen to capture the cross section features of the major isotopes: U-235, U-238, and those in flibe. Figure \ref{fig:xs_isotope} shows the normalized spectrum in different reactor zones and the scattering, fission, absorption and (n, 2n) cross sections of the major isotopes, in superposition of the currently used group structure. 
@@ -544,7 +610,7 @@ In order to automate the process and to ensure reproducibility of the results, a
 \end{table}
 
 The thermal-hydraulics model is implemented in COMSOL as well, so that the multiphysics equation system can be solved in a fully coupled fashion. 
-The model uses thermal property values in Table \ref{tab:flibe} for flibe coolant and graphite reflector. The homogenized pebble-wise properties and the properties of each layer of the fuel elements are listed in table \ref{tab:TRISO_prop} and table \ref{tab:pb_prop}. These nominal values are used in most of the models where the variation in thermo-physical properties for solid materials are not significant within the range of the temperature change. 
+The model uses thermal property values in Table \ref{tab:flibe} for flibe coolant and graphite reflector. The homogenized pebble-wise properties and the properties of each layer of the fuel elements are listed in Table \ref{tab:TRISO_prop} and Table \ref{tab:pb_prop}. These nominal values are used in most of the models where the variation in thermo-physical properties for solid materials are not significant within the range of the temperature change. 
 
 
 
@@ -562,36 +628,6 @@ The model uses thermal property values in Table \ref{tab:flibe} for flibe coolan
     \hline
   \end{tabular}
 \label{tab:flibe}
-\end{table}
-
-\begin{table}
-  \caption{Dimensions and material properties of each layer of TRISO particles.}
-  \begin{tabular}[h]{lccccc}
-    \hline
-    Region&Material&Thickness,&Density,&Conductivity,&Specific heat,\\
-    &&$10^{-6}$ m&kg/m$^3$&W/m/K&J/kg/K\\
-    \hline
-    Kernel&19.9\% UC$_{0.5}$O$_{1.5}$&250&10,500&3.5&400\\
-    Buffer&porous carbon&95&1,000&0.5&2,000\\
-    IPyC&pyrolytic carbon&40&1,900&4.0&2,000\\
-    SiC&silicon carbide&35&3,200&30&1,300\\
-    OPyC&pyrolytic carbon&40&1,900&4.0&2,000\\
-    \hline
-  \end{tabular}
-  \label{tab:TRISO_prop}
-\end{table}
-
-
-\begin{table}
-  \begin{tabular}[h]{ccccc}
-    Region&Material&Thickness/Radius&Density&Conductivity\\
-    &&[mm]&[g/cc]&[W/m.k] \\
-    \hline\\
-    Shell&Graphite&1&10.5&3.5\\
-    Fuel&TRISO+graphtie matrix&2&3.2&15\\
-  \end{tabular}
-  \caption{Dimensions and material properties of each layer of a fuel pebble}
-  \label{tab:pb_prop}
 \end{table}
 
 
@@ -1039,7 +1075,7 @@ The temperatures gradient inside a fuel pebble is higher after the transient bec
 Strict safety requirement for next-generation reactors along with the progress in computer technology prompts the development, qualification and application of time-dependent multi-physics models for FHRs.
 In this paper, a methodology for building coupled neutronics/thermal-hydraulics model for FHRs is described. It utilizes COMSOL Multiphysics to solve for neutron diffusion, delayed neutron precursor concentration equations and porous media CFD. Benchmarking with the Monte Carlo based model shows satisfying agreement. The model provides high resolution two dimensional or three dimensional results within a reasonable amount of time on a computer with 16.0 GB RAM and four Intel Core equipped with i7-4790K CPU at 4.00 GHz.
 
-The Fick's law assumption in diffusion models does not take directional variations in neutron transport into account, and this assumption is violated in strong absorbers such as control rods.
+The Fick's law assumption in diffusion models does not take directional variations in neutron transport into account, and this assumption is violated in strong absorbers such as control rods. Furthermore, $SP_N$ treatment can be used in regions where the diffusion assumption is questioned, such as in the vicinity of the control rods.
 This section describes a control rods modeling method based on the $SP_3$ approximation of NTE that is more accurate than the diffusion approximation, especially in control rod regions, and yet is considerably less expensive than the discrete ordinates ($S_N$) or spherical harmonics ($P_N$) approaches. In addition, the $SP_3$ equations can be solved in the same manner as the diffusion equations, which allows similar implementations with the same tools.
 
 In conventional porous media formulation, only an average temperature inside the solid phase is computed. This is a reasonable assumption in steady state cases and in most slow transient problems where the fuel kernel temperature is very close to the temperature of the surrounding graphite matrix. However, in the case of fast transients involving large power excursions, the difference between fuel and graphite temperatures can be significant. Thus a detailed temperature profile inside the fuel pebbles and TRISO fuel kernels is necessary for accurately computing temperature, which is important in capturing the Doppler temperature reactivity feedback.
