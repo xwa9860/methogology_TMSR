@@ -917,6 +917,16 @@ In the multiscale case, the average fuel temperature is computed as a volume ave
     \label{fig:multi_comp_power_TMSR}
 \end{figure}
 
+
+
+Starting from steady state under nominal conditions and with the same boundary conditions described in the previous section, 1\$ is inserted into the core at time 0. Although an insertion of 1\$ is highly unlikely due to the designed limit of the control rod, it is useful to test the model's ability to handle a large amount of reactivity insertion and to understand the core behaviour in this case as a bounding example. At the onset of the reactivity insertion transient, nuclear power rate increases due to excess of reactivity. Following the power excursion is the temperature rise in the core, first in the fuel, due to the direct deposit of the nuclear energy, and then in the coolant as the energy diffuses out of the fuel pebbles. By design, both elements provide negative temperature reactivity feedback that at the end re-stabilizes the core. 
+
+Temperature reactivity feedback is the most important natural safety mechanism in the core during a reactivity insertion without SCRAM. In FHRs, the feedback from the Doppler broadening of the fuel resonance absorption cross-sections, i.e. the Doppler feedback, is much more prominent than the coolant void feedback. And it reacts promptly, because the Doppler feedback is directly initiated by the changes in the fuel temperature. As a result, the timescale of a reactivity insertion transient is short, shorter than the circulation time of the primary coolant, so the inlet coolant condition remains constant during the simulation.
+
+
+
+Figure \ref{fig:multi_comp_power_TMSR} shows that the power excursion is less severe and the power stays at a lower level after the transient, when the detailed fuel temperature profile is used to compute the Doppler feedback. Also, the response is quicker in this case because the promptness of the Doppler feedback is properly captured. 
+
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/diffusion/tmsr/RI/compare_multiscale/T_flibe_ave.png}
@@ -932,15 +942,6 @@ In the multiscale case, the average fuel temperature is computed as a volume ave
     \caption{Average and maximum fuel temperatures during a 1\$ reactivity insertion transient in TMSR SF-1, with or without multiscale treatment}
     \label{fig:multi_comp_fuel_TMSR}
 \end{figure}
-
-Starting from steady state under nominal conditions and with the same boundary conditions described in the previous section, 1\$ is inserted into the core at time 0. Although an insertion of 1\$ is highly unlikely due to the designed limit of the control rod, it is useful to test the model's ability to handle a large amount of reactivity insertion and to understand the core behaviour in this case as a bounding example. At the onset of the reactivity insertion transient, nuclear power rate increases due to excess of reactivity. Following the power excursion is the temperature rise in the core, first in the fuel, due to the direct deposit of the nuclear energy, and then in the coolant as the energy diffuses out of the fuel pebbles. By design, both elements provide negative temperature reactivity feedback that at the end re-stabilizes the core. 
-
-Temperature reactivity feedback is the most important natural safety mechanism in the core during a reactivity insertion without SCRAM. In FHRs, the feedback from the Doppler broadening of the fuel resonance absorption cross-sections, i.e. the Doppler feedback, is much more prominent than the coolant void feedback. And it reacts promptly, because the Doppler feedback is directly initiated by the changes in the fuel temperature. As a result, the timescale of a reactivity insertion transient is short, shorter than the circulation time of the primary coolant, so the inlet coolant condition remains constant during the simulation.
-
-
-
-Figure \ref{fig:multi_comp_power_TMSR} shows that the power excursion is less severe and the power stays at a lower level after the transient, when the detailed fuel temperature profile is used to compute the Doppler feedback. Also, the response is quicker in this case because the promptness of the Doppler feedback is properly captured. 
-
 
 Comparison of the core average and maximum flibe temperatures between the conventional porous media model and the one with the multiscale treatment is shown in figure \ref{fig:multi_comp_flibe_TMSR}. 
 The coolant flows upward through the fuel pebbles in the TMSR SF-1 core, so the hottest coolant is found at the top. In other words, the maximum coolant temperature also represents the outlet coolant temperature, one of the most important safety parameters in a FHR because this directly relates to the temperature of the metallic structures, the most vulnerable components in a FHR in terms of temperature safety margin.
@@ -966,36 +967,37 @@ In both cases, the temperatures deviate further from each other during the trans
 
  
 
-As discussed before, the multiscale treatment is important in capturing the correct feedback behaviour, so the results shown hereafter are with the treatment.  
-Figure \ref{fig:RI_pcm} shows the power and temperature evolution during a 1\$ or 0.5\$ reactivity insertion. 
- During the 1\$ prompt insertion transient, the core maximum fuel temperature is 1500$^{\circ}C$, below the safety limit(1600$^{\circ}C$). 
-Coolant temperature is raised by only 100$^{\circ}C$ at the peak. 
+% As discussed before, the multiscale treatment is important in capturing the correct feedback behaviour, so the results shown hereafter are with the treatment.  
+% Figure \ref{fig:RI_pcm} shows the power and temperature evolution during a 1\$ or 0.5\$ reactivity insertion. 
+%  During the 1\$ prompt insertion transient, the core maximum fuel temperature is 1500$^{\circ}C$, below the safety limit(1600$^{\circ}C$). 
+% Coolant temperature is raised by only 100$^{\circ}C$ at the peak. 
 
 
-\begin{figure}[h]
-    \centering
-        \includegraphics[width=1\linewidth]{./images/diffusion/tmsr/RI/diff_pcm/power.png}
-        \includegraphics[width=1\textwidth]{./images/diffusion/tmsr/RI/diff_pcm/T_flibe_max.png}
-        \includegraphics[width=1\textwidth]{./images/diffusion/tmsr/RI/diff_pcm/T_fuel_max.png}
-    \caption{RI transients results}
-    \label{fig:RI_pcm}
-\end{figure}
+% \begin{figure}[h]
+%     \centering
+%         \includegraphics[width=1\linewidth]{./images/diffusion/tmsr/RI/diff_pcm/power.png}
+%         \includegraphics[width=1\textwidth]{./images/diffusion/tmsr/RI/diff_pcm/T_flibe_max.png}
+%         \includegraphics[width=1\textwidth]{./images/diffusion/tmsr/RI/diff_pcm/T_fuel_max.png}
+%     \caption{RI transients results}
+%     \label{fig:RI_pcm}
+% \end{figure}
 
 
-Figure \ref{fig:RI_time} shows the effect of the timescale of the reactivity insertion on the safety parameters. Without SCRAM, the reactor reaches the same end state due to reactivity feedback mechanisms. However, safety measures can take in place to mitigate the consequence if the transient is slow. 
+% Figure \ref{fig:RI_time} shows the effect of the timescale of the reactivity insertion on the safety parameters. Without SCRAM, the reactor reaches the same end state due to reactivity feedback mechanisms. However, safety measures can take in place to mitigate the consequence if the transient is slow. 
 
-\begin{figure}[h]
-    \centering
-        \includegraphics[width=\textwidth]{./images/diffusion/tmsr/RI/diff_time/power.png}
-        \includegraphics[width=\textwidth]{./images/diffusion/tmsr/RI/diff_time/T_flibe_max.png}
-        \includegraphics[width=\textwidth]{./images/diffusion/tmsr/RI/diff_time/T_fuel_max.png}
-    \caption{RI transients results}
-    \label{fig:RI_time}
-\end{figure}
+% \begin{figure}[h]
+%     \centering
+%         \includegraphics[width=\textwidth]{./images/diffusion/tmsr/RI/diff_time/power.png}
+%         \includegraphics[width=\textwidth]{./images/diffusion/tmsr/RI/diff_time/T_flibe_max.png}
+%         \includegraphics[width=\textwidth]{./images/diffusion/tmsr/RI/diff_time/T_fuel_max.png}
+%     \caption{RI transients results}
+%     \label{fig:RI_time}
+% \end{figure}
 
 
 
 %-------------------------------------------------------------------------------------------------------------------------
+\newpage
 \subsection{Overcooling transients}
 
 \begin{figure}[h]
