@@ -230,8 +230,8 @@ For criticality calculations, the effective multiplication factor \keff is inser
 
 
 \subsubsection{Cross-section generation}
-The group-averaged, component-wise neutronic constants, used in the diffusion equations, are generated with the Monte Carlo neutron transport code Serpent using the nuclear data library ENDF/B-VII.0. 
-In order to perform transient analysis, these cross-sections need to be paramatrized as functions of reactor operating conditions via a process called computer experiments, in which one runs a Monte Carlo model with a sample of operating conditions and fits a function between the resulting cross-sections and the input data.
+The group-averaged, component-wise neutronic constants, used in the diffusion equations, are generated with the Monte Carlo neutron transport code Serpent \cite{Serpent2015} using the nuclear data library ENDF/B-VII.0. 
+In order to perform transient analysis, these cross-sections are paramatrized as function of reactor operating conditions via a process called computer experiments, in which one runs a Monte Carlo model with a sample of operating conditions and fits a function between the resulting cross-sections and the input data.
 
 The change in macroscopic cross-sections in the flibe region is mainly due to the change in density of liquid flibe with temperature, thus the function for flibe cross-sections are in the following form:
 
@@ -243,8 +243,8 @@ The change in macroscopic cross-sections in the flibe region is mainly due to th
 where $\hat{\Sigma}(\rho_{flibe})$ is the estimation of a flibe macroscopic cross-section, $\rho_{flibe}$ is the flibe density that depends on the temperature, $\rho_0$ is the flibe density at nominal temperature, and 
 $c_0$ and $c_1$ are the constants to be calculated.
 
-Unlike liquid salt, the solid fuel elements do not change shape or density in the considered temperature range. 
-The change in fuel cross-sections are mainly due to the Doppler broadening of the microscopic cross-sections of the fuel material and exhibit a linear-log function of temperature.  It is important for FHRs to compute the temperature distribution inside TRISO particles and fuel pebbles, and use the temperature profile, instead of an average fuel temperature, to compute cross-sections, because during fast transients such as reactivity induced accidents, the heat does not have time to propagate through the fuel pebbles and to reach the coolant and therefore the core relies on the temperature reactivity feedback inside the TRISO particles to stabilize.
+Unlike liquid salt, the solid fuel elements do not significantly change shape or density in the considered temperature range. 
+The change in fuel cross-sections are mainly due to the Doppler broadening of the microscopic cross-sections of the fuel material and thus exhibit a linear-log function of temperature.  It is important for FHRs to compute the temperature distribution inside TRISO particles and fuel pebbles, and use the temperature profile, instead of an average fuel temperature, to compute cross-sections, because during fast transients such as reactivity induced accidents, the heat does not have time to propagate through the fuel pebbles to reach the coolant and therefore the core relies on the temperature reactivity feedback inside the TRISO particles to stabilize.
 A multiscale cross-section, incorporating a vector of temperatures at different depth in the fuel element, is express as a linear combination of the logarithm of fuel temperatures:
 
 \begin{equation}
@@ -264,7 +264,7 @@ where $\hat{\Sigma}(T_{fuel})$ is the estimation of a macroscopic cross-section 
 \subsection{Thermal-hydraulics}
 Direct CFD modeling of the flow passage formed by more than 10000 pebbles is not practical with current computation capacity. The porous media approach, on the other hand, requires considerably less computational resource and is used in the multi-physics model.
 
-An important parameter for porous media is the porosity, $\epsilon$, defined as the ratio between the volume of the void to the total volume (Equation \ref{eq:pf}). It appears in the mass (Equation \ref{eq:mass}), momentum (Equation \ref{eq:mmtm}) and energy conservation equations (equations \ref{eq:pm_liq} and \ref{eq:pm_sol}) below. Local variation in porosity in a pebble bed, including the drop near the wall due to ordered packing, is not modeled explicitly in the porous media model, but the empirical correlations for pressure loss and heat transfer coefficient incorporate corrections for wall effect.
+An important parameter for porous media is the porosity, $\epsilon$, defined as the ratio between the volume of the void to the total volume (Equation \ref{eq:pf}). It appears in the mass (Equation \ref{eq:mass}), momentum (Equation \ref{eq:mmtm}) and energy conservation equations (Equations \ref{eq:pm_liq} and \ref{eq:pm_sol}) below. Local variation in porosity in a pebble bed, including the drop near the wall due to ordered packing, is not modeled explicitly in the porous media model, but the empirical correlations for pressure loss and heat transfer coefficient incorporate corrections for wall effect.
 
 
 \begin{equation}
@@ -294,7 +294,7 @@ The dependent variable here is the superficial velocity, the velocity that the f
   \label{eq:sv}
 \end{equation}
 
-Other parameters used in equation \ref{eq:mmtm} are:\\
+Other parameters used in Equation \ref{eq:mmtm} are:\\
 $\rho_f$ = fluid density, kg/m3\\
 $\epsilon$ = porosity\\
 t = time, s\\
@@ -355,36 +355,27 @@ The energy equations for fluid and solid phases are given in equations \ref{eq:p
 In the energy equations, $\rho c_p$ is the volumetric heat capacity in $Jm^3K^{-1}$, $T_f$ and $T_s$ are respectively the fluid temperature and the solid temperature in K, $k_f$ is the fluid thermal conductivity in $Wm^{-1}K^{-1}$, a is the specific surface area in $m^{-1}$, q is the heat generation in $Wm^{-3}$.
 
 In a typical nuclear reactor, 97\% of the energy is deposited in the fuel while the rest is transported in coolant, reflectors and even shield by long range particles such as neutrons and gammas. 
-In the current model, nuclear power is assumed generated inside the solid medium of the fuel region and transferred to the coolant through heat convection. Reflectors have separate coolant channels to maintain the temperature and temperature in outer layers such as graphite reflectors and stainless steel containment has negligible effect on neutronics behaviour, therefore conservative adiabatic boundary condition is applied at the reflector walls and the temperatures of the outer layers are not computed in the coupled simulation. However, they can be computed using the coupled simulation results as boundary conditions.
+In the current model, nuclear power is assumed generated inside the solid medium of the fuel region and transferred to the coolant through heat convection. Reflectors have separate coolant channels to maintain the temperature and temperature in outer layers such as graphite reflectors and stainless steel containment has negligible effect on neutronics behaviour, therefore conservative adiabatic boundary condition is applied at the reflector walls and the temperatures of the outer layers are not computed in the coupled simulation. 
 
-In a porous media model, the convective heat transfer between the fuel pebbles and the coolant is computed from empirical correlations, whose validation affects directly the credibility of the results. The Wakao correlation (equation \ref{eq:wakao}) \cite{Wakao1979} calculates the convective heat transfer coefficient between pebbles and coolant, with Pr and Re the Prandtl and Reynolds numbers.
+In a porous media model, the convective heat transfer between the fuel pebbles and the coolant is computed from Wakao correlation (Equation \ref{eq:wakao}) \cite{Wakao1979}.
 
 \begin{equation}
   Nu = 2 + 1.1 Pr^{1/3}Re^{0.6} 
   \label{eq:wakao}
 \end{equation}
 
-The convective heat transfer coefficient can be obtained from the Nussult number, the salt thermal conductivity k and pebble diameter $D_p$ using the relationship in equation \ref{eq:nuh}.
 
-\begin{equation}
-  h = \frac{kNu}{D_p}
-  \label{eq:nuh}
-\end{equation}
-
-
-Inlet coolant temperature are imposed at the inlet boundary.  This enables modeling of overcooling transient by setting the inlet coolant temperature as a time dependent function. Either flow rate or detailed velocity profile perpendicular to the inlet surface can be imposed as flow straighteners are designed to make sure that the inlet flow is fully developed and the coolant injection channels are designed for prescribed inlet flow conditions.
-Zero pressure is set to the outlet surfaces. Slip conditions neglect viscous effects are applied to the walls that contain the fluid.  
 
 \subsubsection{Multi-scale temperature distribution}
 
-In order to determine the temperature distribution inside fuel pebbles and TRISO particles, which is crucial for accurately determining the temperature reactivity feedback from the fuel material during transient scenarios, we use the 1-D heat diffusion equation in spherical coordinate to model the heat conduction inside solid fuel elements:
+In order to determine the temperature distribution inside fuel pebbles and TRISO particles, which is important to compute cross-sections in the fuel region during transient scenarios, we use the 1-D heat diffusion equation in spherical coordinate to model the heat conduction inside solid fuel elements:
 
 \begin{align}
   \rho C_p\frac{\partial T}{\partial t} = \frac{1}{r^2}\frac{\partial}{\partial r}\left(kr^2\frac{\partial T}{\partial r}\right) + g
 \end{align}
 where r is the radial coordinate of the point, $\rho$ is density, $C_p$ is specific heat capacity, T is temperature, t is time, k is thermal conductivity, and g is the heat generation density.
 
-And the resulting equation from a change of variable $U(r,t)=rT(r,t)$ is shown below:
+After a change of variable $U(r,t)=rT(r,t)$, the equation is transformed to the following form:
 
 \begin{align}
   \frac{\partial U}{\partial t} = \alpha \frac{\partial ^2 U}{\partial r^2} + r \frac{g}{\rho C_p}
@@ -577,8 +568,7 @@ The TMSR SF-1 core is surrounded by an outer graphite reflector, which provides 
 
 \subsection{Multiphysics modeling for TMSR SF-1}
 
-As shown in Figure \ref{fig:model_geom}, the multiphysics reactor core model is composed by three regions: an upper porous region that represents a fuel pebble and flibe salt porous mixture, a lower region with only flibe salt and an outer graphite reflector region. Coupled heat transfer and neutron diffusion equations are solved with homogenized material properties for each region. 
-
+As shown in Figure \ref{fig:model_geom}, the multiphysics reactor core model is composed by three regions: an upper porous region that represents a fuel pebble and flibe salt porous mixture, a lower region with only flibe salt and an outer graphite reflector region. 
 
 \begin{figure}[h]
   \centering
@@ -631,9 +621,7 @@ The code is set up for any user defined group structures and the one that is use
 To model the flow field and heat transfer in the pebble bed, porous media approach computes a liquid temperature and a fuel temperature at each point in the region and connect the two phases through convective heat transfer. The fuel temperature is of prime important in FHR transient response because of the large Doppler temperature reactivity feedback. Therefore, multiscale temperature treatment is implemented for a more realistic representation of the feedback from fuel temperature changes. 
 Temperature inside fuel pebbles are computed in three subdivided fuel layers, and likewise the fuel kernel in the TRISO particles are divided into three sub-layers, for which temperatures are tracked during a transient and are used to compute fuel region macroscopic cross-sections. In order to save computational cost, the coatings are combined into a non-heat-generating layer with equivalent heat transfer properties. The effects of this treatment on the response to reactivity insertion and overcooling transients are discussed further in section \ref{sec:TMSR_transients} when we analyze the TMSR transient behaviors.
 
-A vacuum boundary condition is applied at the outer surfaces of the reflector. And a symmetry boundary condition is used at the core center-line in 2-D axi-symmetrical models.
-
-
+A vacuum boundary condition is applied at the outer surfaces of the reflector. And a symmetry boundary condition is used at the core center-line in 2-D axi-symmetrical models. Inlet coolant flow condition and temperature are imposed at the inlet boundary.  This enables modeling of overcooling transient by setting the inlet coolant temperature as a time dependent function. Zero pressure is set to the outlet surfaces. Slip conditions neglect viscous effects are applied to the walls that contain the fluid.  
 
 
 % ----------------------------------------------------------------------------------------------------------------------
